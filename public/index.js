@@ -1,6 +1,4 @@
-var countries = null;
-var regions = null;
-var subRegions = null;
+var characters = null;
 
 var makeRequest = function (url, callback) {
   var request = new XMLHttpRequest();
@@ -11,183 +9,79 @@ var makeRequest = function (url, callback) {
 
 //remember there are 4 things in makerequest function
 
-var populateList = function (someCountries) {
-  console.log(someCountries)
-  var dropDown = document.querySelector('#country-list');
+var populateList = function (someCharacters) {
+  var dropDown = document.querySelector('#character-list');
   dropDown.innerText = "";
-  someCountries.forEach( function(country) {
-    var place = document.createElement('option');
-    place.innerText = country.name;
-    dropDown.appendChild(place);
+  someCharacters.forEach( function(character) {
+    var dude = document.createElement('option');
+    dude.innerText = character.name;
+    dropDown.appendChild(dude);
   });
-}
-
-var regionList = function () {
-  regions = [];
-  regions.push("World");
-  var regionDropDown = document.querySelector('#region-list');
-  for (country of countries) {
-    if (!regions.includes(country.region)) {
-      regions.push(country.region);
-      console.log(regions);
-    }
-  }
-
-  for (region of regions) {
-    var place = document.createElement('option');
-    place.innerText = region;
-    regionDropDown.appendChild(place);
-    console.log(regionDropDown);
-  }
-
-}
-
-var subRegionList = function () {
-  subRegions = [];
-  subRegions.push("World");
-  var subRegionDropDown = document.querySelector('#sub-region-list');
-  for (country of countries) {
-    if (!subRegions.includes(country.subregion)) {
-      subRegions.push(country.subregion);
-      console.log(subRegions);
-    }
-  }
-
-  for (subRegion of subRegions) {
-    var place = document.createElement('option');
-    place.innerText = subRegion;
-    subRegionDropDown.appendChild(place);
-    console.log(subRegionDropDown);
-  }
-
 }
 
 var requestComplete = function () {
   if (this.status !== 200) return;
   var jsonString = this.responseText;
-  countries = JSON.parse(jsonString);
-  populateList(countries);
-  regionList();
-  subRegionList();
+  characters = JSON.parse(jsonString);
+  populateList(characters);
+  console.log(characters)
 }
 
-var save = function (country) {
-  var countryString = JSON.stringify(country);
-  localStorage.setItem('country', countryString)
+var save = function (character) {
+  var characterString = JSON.stringify(character);
+  localStorage.setItem('character', characterString)
 }
 
 var load = function () {
-  var countryString = localStorage.getItem('country');
-  return JSON.parse(countryString);
+  var characterString = localStorage.getItem('character');
+  return JSON.parse(characterString);
 }
 
-
-
 var app = function(){
-
-  var center = {lat: 51.507351, lng: -0.127758 };
-  var mapDiv = document.querySelector('#map');
-
-  var mainMap = new MapWrapper(mapDiv, center, 10);
-  // mainMap.addMarker(center);
-
-  var url = 'https://restcountries.eu/rest/v1/all';
+  var url = 'http://hp-api.herokuapp.com/api/characters';
   makeRequest(url, requestComplete);
 
-  var findBorderingCountries = function (country) {
-    var borderDiv = document.querySelector('#border-country-info');
-    borderDiv.innerText = "";
-    for (otherCountry of countries) {
-      if (otherCountry.borders.includes(country.alpha3Code)) {
-        var borderCountry = document.createElement('p');
-        borderCountry.innerText = otherCountry.name;
-        borderDiv.appendChild(borderCountry);
-      }
-    }
-  }
-
-  var setCountryDisplay = function(country) {
-    var info = document.querySelector('#country-info');
+  var setCharacterDisplay = function(character) {
+    var info = document.querySelector('#character-info');
     info.innerText = "";
 
     var name = document.createElement('h1');
     info.appendChild(name);
-    name.innerText = "Name: " + country.name;
+    name.innerText = "Name: " + character.name;
 
-    var capital = document.createElement('p');
-    info.appendChild(capital);
-    capital.innerText = "Capital: " + country.capital;
+    var house = document.createElement('p');
+    info.appendChild(house);
+    house.innerText = "House: " + character.house;
 
-    var population = document.createElement('p');
-    info.appendChild(population);
-    population.innerText = "Population: " + country.population;
+    if (character.yearOfBirth != null) {
+    var birthdate = document.createElement('p');
+      info.appendChild(birthdate);
+    birthdate.innerText = "Year of birth: " + character.yearOfBirth;
+  }
 
-    mainMap.moveCenter({lat: country.latlng[0], lng: country.latlng[1] });
-    // mainMap.zoomLevel(country.area, {lat: country.latlng[0], lng: country.latlng[1] });
+    var patronus = document.createElement('p');
+    info.appendChild(patronus);
+    patronus.innerText = "Patronus: " + character.patronus;
 
-    save(country);
+    var actor = document.createElement('p');
+    info.appendChild(actor);
+    actor.innerText = "Actor: " + character.actor;
+
+    save(character);
     
   }
-  setCountryDisplay(load());
 
-  var dropDown = document.querySelector('#country-list');
+  var dropDown = document.querySelector('#character-list');
 
   dropDown.onchange = function() {
-    countries.forEach( function(country) {
-      if(country.name == dropDown.value) {
-        setCountryDisplay(country);
-        findBorderingCountries(country);
+    characters.forEach( function(character) {
+      if(character.name == dropDown.value) {
+        setCharacterDisplay(character);
       }
     })
   }
 
-  var regionDropDown = document.querySelector('#region-list');
-  var subRegionDropDown = document.querySelector('#sub-region-list');
-
-  regionDropDown.onchange = function() {
-    subRegionDropDown.value = "World";
-    console.log(regionDropDown.value);
-    var ofRegion = [];
-    if(regionDropDown.value === "World"){
-      populateList(countries);
-    } else {
-      for (country of countries) {
-        if(country.region === regionDropDown.value) {
-          ofRegion.push(country);
-        }
-      }
-      populateList(ofRegion);
-    }
-    console.log(ofRegion);
-  }
-
-  
-
-  subRegionDropDown.onchange = function() {
-    regionDropDown.value = "World"
-    console.log(subRegionDropDown.value);
-    var ofSubRegion = [];
-    if(subRegionDropDown.value === "World"){
-      populateList(countries);
-    } else {
-      for (country of countries) {
-        if(country.subregion === subRegionDropDown.value) {
-          ofSubRegion.push(country);
-        }
-      }
-      populateList(ofSubRegion);
-    }
-    console.log(ofSubRegion);
-    
-  }
 
 }
-
-  // var button = document.querySelector('button')
-  // var url = 'https://restcountries.eu/rest/v1/all';
-  // var countries = makeRequest(url, requestComplete);
-
-  // button.onclick = function () {
-  // }
 
   window.onload = app;

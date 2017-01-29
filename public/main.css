@@ -2,11 +2,6 @@ body {
   display: flex;
 }
 
-#map {
-  width: 600px;
-  height: 600px;
-}
-
 #content {
   flex-direction: column;
   width: 300px;
@@ -16,14 +11,6 @@ h1 {
   border: 1px black solid;
 }
 
-#country-list {
-  border: 1px black solid;
-}
-
-#border-country {
-  border: 1px black solid;
-}
-
-#border-country-info {
+#character-list {
   border: 1px black solid;
 }
