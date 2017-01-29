@@ -7,8 +7,6 @@ var makeRequest = function (url, callback) {
   request.send();
 }
 
-//remember there are 4 things in makerequest function
-
 var populateList = function (someCharacters) {
   var dropDown = document.querySelector('#character-list');
   dropDown.innerText = "";
@@ -18,6 +16,28 @@ var populateList = function (someCharacters) {
     dropDown.appendChild(dude);
   });
 }
+
+///adding an image
+
+var createImage = function(url) {
+  var charImage = document.createElement('img');
+  charImage.src = url;
+  return charImage;
+}
+
+var addChar = function(charUrl) {
+  var charImage = createImage(charUrl);
+  var characters = document.getElementById("image");
+  characters.appendChild(charImage);
+}
+
+// var addSeveralCats = function() {
+//   images.forEach(function(image) {
+//   addCharacter(image.characterImage);
+//   })
+// }
+
+///adding an image
 
 var requestComplete = function () {
   if (this.status !== 200) return;
@@ -53,6 +73,7 @@ var app = function(){
     info.appendChild(house);
     house.innerText = "House: " + character.house;
 
+//this IF function doesn't work :(
     if (character.yearOfBirth != null) {
     var birthdate = document.createElement('p');
       info.appendChild(birthdate);
@@ -78,9 +99,11 @@ var app = function(){
       if(character.name == dropDown.value) {
         setCharacterDisplay(character);
       }
+      if(dropDown.value == "Harry Potter") {
+        addChar("http://cdn.playbuzz.com/cdn/23651551-a1f5-47ad-8709-f3535f0defaf/973dfb63-f694-4062-a9ac-444107fd2ee5.jpg");
+      }
     })
   }
-
 
 }
 
